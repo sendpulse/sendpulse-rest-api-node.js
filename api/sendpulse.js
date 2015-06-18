@@ -118,7 +118,6 @@ function sendRequest(path, method, data, useToken, callback){
                     try {
                         var answer = JSON.parse(str);
                     } catch (ex) {
-                        console.log(str);
                         var answer = returnError();
                     }
                     callback(answer);
