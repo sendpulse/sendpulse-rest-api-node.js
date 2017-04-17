@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dshemendiuk/sendpulse-rest-api-node.js.git"
+    "url": "https://github.com/sendpulse/sendpulse-rest-api-node.js.git"
   },
   "keywords": [
     "sendpulse",
@@ -17,7 +17,7 @@
   "author": "SendPulse",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/dshemendiuk/sendpulse-rest-api-node.js/issues"
+    "url": "https://github.com/sendpulse/sendpulse-rest-api-node.js/issues"
   },
-  "homepage": "https://github.com/dshemendiuk/sendpulse-rest-api-node.js"
+  "homepage": "https://github.com/sendpulse/sendpulse-rest-api-node.js"
 }
