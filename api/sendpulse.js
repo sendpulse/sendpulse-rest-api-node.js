@@ -326,6 +326,28 @@ function removeAddressBook(callback,id){
 }
 
 /**
+ * Get list of email templates
+ *
+ * @param callback
+ */
+function listEmailTemplates(callback){
+    sendRequest('templates', 'GET', {}, true, callback);
+}
+
+/**
+ * Get email template by id
+ *
+ * @param callback
+ * @param id
+ */
+function getEmailTemplate(callback, id){
+    if (id === undefined) {
+        return callback(returnError('Empty email template id'));
+    }
+    sendRequest('template/' + id, 'GET', {}, true, callback);
+}
+
+/**
  * Get information about book
  *
  * @param callback
@@ -851,6 +873,8 @@ exports.listAddressBooks = listAddressBooks;
 exports.createAddressBook = createAddressBook;
 exports.editAddressBook = editAddressBook;
 exports.removeAddressBook = removeAddressBook;
+exports.listEmailTemplates = listEmailTemplates;
+exports.getEmailTemplate = getEmailTemplate;
 exports.getBookInfo = getBookInfo;
 exports.getEmailsFromBook = getEmailsFromBook;
 exports.addEmails = addEmails;
