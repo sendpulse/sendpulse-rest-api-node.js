@@ -868,6 +868,320 @@ function smtpSendMail( callback, email ) {
     sendRequest( 'smtp/emails', 'POST', data, true, callback );
 }
 
+
+// *********************************  SMS  *********************************
+
+/**
+ * Add new phones to address book
+ *
+ * @param callback
+ * @param addressbook_id
+ * @param phones
+ */
+function smsAddPhones(callback, addressbook_id, phones) {
+    if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones or book id"));
+    }
+    var data = {
+        addressBookId: addressbook_id,
+        phones: JSON.stringify(phones)
+    };
+    sendRequest('sms/numbers', 'POST', data, true, callback);
+}
+
+/**
+ * Add new phones to address book with variables
+ *
+ * @param callback
+ * @param addressbook_id
+ * @param phones
+ */
+function smsAddPhonesWithVariables(callback, addressbook_id, phones) {
+    if ((addressbook_id === undefined) || (phones === undefined) || (!Object.keys(phones).length)) {
+        return callback(returnError("Empty phones or book id"));
+    }
+    var data = {
+        addressBookId: addressbook_id,
+        phones: JSON.stringify(phones)
+    };
+    sendRequest('sms/numbers/variables', 'POST', data, true, callback);
+}
+
+/**
+ * Remove phones from address book
+ *
+ * @param callback
+ * @param addressbook_id
+ * @param phones
+ */
+function smsRemovePhones(callback, addressbook_id, phones) {
+    if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones or book id"));
+    }
+    var data = {
+        addressBookId: addressbook_id,
+        phones: JSON.stringify(phones)
+    };
+    sendRequest('sms/numbers', 'DELETE', data, true, callback);
+}
+
+/**
+ * Get all phones from blacklist
+ *
+ * @param callback
+ */
+function smsGetBlackList(callback){
+    sendRequest( 'sms/black_list', 'GET', {}, true, callback );
+}
+
+/**
+ * Get information about phone from the address book
+ *
+ * @param callback
+ * @param addressbook_id
+ * @param phone
+ */
+function smsGetPhoneInfo(callback, addressbook_id, phone) {
+    if ((addressbook_id === undefined) || (phone === undefined)) {
+        return callback(returnError("Empty phone or book id"));
+    }
+
+    sendRequest('sms/numbers/info/' + addressbook_id + '/' + phone, 'GET', {}, true, callback);
+}
+
+/**
+ * Update phones variables from the address book
+ *
+ * @param callback
+ * @param addressbook_id
+ * @param phones
+ * @param variables
+ */
+function smsUpdatePhonesVariables(callback, addressbook_id, phones, variables) {
+    if (addressbook_id === undefined) {
+        return callback(returnError("Empty book id"));
+    }
+    if ((phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones"));
+    }
+    if ((variables === undefined) || (!Object.keys(variables).length)) {
+        return callback(returnError("Empty variables"));
+    }
+    var data = {
+        'addressBookId': addressbook_id,
+        'phones': JSON.stringify(phones),
+        'variables': JSON.stringify(variables)
+    }
+
+    sendRequest('sms/numbers', 'PUT', data, true, callback);
+}
+
+/**
+ * Get info by phones from the blacklist
+ *
+ * @param callback
+ * @param phones
+ */
+function smsGetPhonesInfoFromBlacklist(callback, phones) {
+    if ((phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones"));
+    }
+    var data = {
+        'phones': JSON.stringify(phones),
+    }
+
+    sendRequest('sms/black_list/by_numbers', 'GET', data, true, callback);
+}
+
+/**
+ * Add phones to blacklist
+ *
+ * @param callback
+ * @param phones
+ * @param comment
+ */
+function smsAddPhonesToBlacklist(callback, phones, comment){
+    if ((phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones"));
+    }
+    var data = {
+        'phones': JSON.stringify(phones),
+        'description': comment
+    }
+
+    sendRequest('sms/black_list', 'POST', data, true, callback);
+}
+
+/**
+ * Remove phones from blacklist
+ *
+ * @param callback
+ * @param phones
+ */
+function smsDeletePhonesFromBlacklist(callback, phones) {
+    if ((phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones"));
+    }
+    var data = {
+        'phones': JSON.stringify(phones),
+    }
+
+    sendRequest('sms/black_list', 'DELETE', data, true, callback);
+}
+
+/**
+ * Create new sms campaign
+ *
+ * @param callback
+ * @param sender_name
+ * @param addressbook_id
+ * @param body
+ * @param date
+ * @param transliterate
+ */
+function smsAddCampaign(callback, sender_name, addressbook_id, body, date, transliterate){
+    if (sender_name === undefined) {
+        return callback(returnError("Empty sender name"));
+    }
+    if (addressbook_id === undefined) {
+        return callback(returnError("Empty book id"));
+    }
+    if (body === undefined) {
+        return callback(returnError("Empty sms text"));
+    }
+    var data = {
+        'sender': sender_name,
+        'addressBookId': addressbook_id,
+        'body': body,
+        'date': date,
+        'transliterate': transliterate
+    }
+
+    sendRequest('sms/campaigns', 'POST', data, true, callback);
+}
+
+/**
+ * Send sms by some phones
+ *
+ * @param callback
+ * @param sender_name
+ * @param phones
+ * @param body
+ * @param date
+ * @param transliterate
+ */
+function smsSend(callback, sender_name, phones, body, date, transliterate) {
+    if (sender_name === undefined) {
+        return callback(returnError("Empty sender name"));
+    }
+    if ((phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty phones"));
+    }
+    if (body === undefined) {
+        return callback(returnError("Empty sms text"));
+    }
+    var data = {
+        'sender': sender_name,
+        'phones': JSON.stringify(phones),
+        'body': body,
+        'date': date,
+        'transliterate': transliterate
+    }
+
+    sendRequest('sms/send', 'POST', data, true, callback);
+}
+
+/**
+ * Get list of campaigns
+ *
+ * @param callback
+ * @param date_from
+ * @param date_to
+ */
+function smsGetListCampaigns(callback, date_from, date_to) {
+    var data = {
+        'dateFrom': date_from,
+        'dateTo': date_to
+    }
+
+    sendRequest('sms/campaigns/list', 'GET', data, true, callback);
+}
+
+/**
+ * Get information about sms campaign
+ *
+ * @param callback
+ * @param campaign_id
+ */
+function smsGetCampaignInfo(callback, campaign_id){
+    if (campaign_id === undefined) {
+        return callback(returnError("Empty sms campaign id"));
+    }
+
+    sendRequest('sms/campaigns/info/' + campaign_id, 'GET', {}, true, callback);
+}
+
+/**
+ * Cancel sms campaign
+ *
+ * @param callback
+ * @param campaign_id
+ */
+function smsCancelCampaign(callback, campaign_id) {
+    if (campaign_id === undefined) {
+        return callback(returnError("Empty sms campaign id"));
+    }
+
+    sendRequest('sms/campaigns/cancel/' + campaign_id, 'PUT', {}, true, callback);
+}
+
+/**
+ * Get cost sms campaign
+ *
+ * @param callback
+ * @param sender
+ * @param body
+ * @param addressbook_id
+ * @param phones
+ */
+function smsGetCampaignCost(callback, sender_name, body, addressbook_id, phones){
+    if (sender_name === undefined) {
+        return callback(returnError("Empty sender name"));
+    }
+    if (body === undefined) {
+        return callback(returnError("Empty sms text"));
+    }
+    if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
+        return callback(returnError("Empty book id or phones"));
+    }
+    var data = {
+        'sender': sender_name,
+        'body': body,
+        'addressBookId': addressbook_id
+    }
+    if (phones.length) {
+        data['phones'] = JSON.stringify(phones);
+    }
+
+    sendRequest('sms/campaigns/cost', 'GET', data, true, callback);
+}
+
+/**
+ * Remove sms campaign
+ *
+ * @param callback
+ * @param campaign_id
+ */
+function smsDeleteCampaign(callback, campaign_id) {
+    if (campaign_id === undefined) {
+        return callback(returnError("Empty sms campaign id"));
+    }
+    var data = {
+        'id': campaign_id
+    }
+    sendRequest('sms/campaigns', 'DELETE', data, true, callback);
+}
+
 exports.init = init;
 exports.listAddressBooks = listAddressBooks;
 exports.createAddressBook = createAddressBook;
@@ -908,3 +1222,19 @@ exports.smtpListAllowedDomains = smtpListAllowedDomains;
 exports.smtpAddDomain = smtpAddDomain;
 exports.smtpVerifyDomain = smtpVerifyDomain;
 exports.smtpSendMail = smtpSendMail;
+exports.smsGetBlackList = smsGetBlackList;
+exports.smsAddPhones = smsAddPhones;
+exports.smsAddPhonesWithVariables = smsAddPhonesWithVariables;
+exports.smsRemovePhones = smsRemovePhones;
+exports.smsGetPhoneInfo = smsGetPhoneInfo;
+exports.smsUpdatePhonesVariables = smsUpdatePhonesVariables;
+exports.smsGetPhonesInfoFromBlacklist = smsGetPhonesInfoFromBlacklist;
+exports.smsAddPhonesToBlacklist = smsAddPhonesToBlacklist;
+exports.smsDeletePhonesFromBlacklist = smsDeletePhonesFromBlacklist;
+exports.smsAddCampaign = smsAddCampaign;
+exports.smsSend = smsSend;
+exports.smsGetListCampaigns = smsGetListCampaigns;
+exports.smsGetCampaignInfo = smsGetCampaignInfo;
+exports.smsCancelCampaign = smsCancelCampaign;
+exports.smsGetCampaignCost = smsGetCampaignCost;
+exports.smsDeleteCampaign = smsDeleteCampaign;

@@ -87,3 +87,40 @@ var email = {
         ]
     };
 sendpulse.smtpSendMail(answerGetter,email);
+
+// ******************* SMS ***********************
+
+sendpulse.smsAddPhones(answerGetter, 123456, ['11111111111', '22222222222']);
+var phones = {
+    "11111111111":
+        [
+            [
+                {"name" : "test1", "type" : "date", "value" : "2018-10-10 23:00:00"},
+                {"name" : "test2", "type" : "string", "value" : "asdasd"},
+                {"name" : "test3", "type" : "number", "value" : "123"}
+            ]
+        ],
+    "22222222222":
+        [
+            [
+                {"name" : "test1", "type" : "date", "value" : "2018-10-10 23:00:00"},
+                {"name" : "test2", "type" : "string", "value" : "czxczx"},
+                {"name" : "test3", "type" : "number", "value" : "456"}
+            ]
+        ]
+}
+sendpulse.smsAddPhonesWithVariables(answerGetter, 123456, phones);
+sendpulse.smsRemovePhones(answerGetter, 123456, ['11111111111', '22222222222']);
+sendpulse.smsGetPhoneInfo(answerGetter, 123456, '11111111111');
+sendpulse.smsUpdatePhonesVariables(answerGetter, 123456, ['11111111111'], [{"name":"test","type":"string", "value":"test"}]);
+sendpulse.smsGetBlackList(answerGetter);
+sendpulse.smsGetPhonesInfoFromBlacklist(answerGetter, ['11111111111']);
+sendpulse.smsAddPhonesToBlacklist(answerGetter, ['11111111111'], 'test');
+sendpulse.smsDeletePhonesFromBlacklist(answerGetter, ['11111111111']);
+sendpulse.smsAddCampaign(answerGetter, 'test', 123456, 'test sms');
+sendpulse.smsSend(answerGetter, 'test', ['11111111111'], 'test sms');
+sendpulse.smsGetListCampaigns(answerGetter, '2018-04-15 15:00:00', '2018-04-26 15:00:00');
+sendpulse.smsGetCampaignInfo(answerGetter, 123456);
+sendpulse.smsCancelCampaign(answerGetter, 123456);
+sendpulse.smsGetCampaignCost(answerGetter, 'sender_test', 'body_test', null, ['111111111']);
+sendpulse.smsDeleteCampaign(answerGetter, 123456);
