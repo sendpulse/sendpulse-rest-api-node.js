@@ -2,11 +2,10 @@
  * SendPulse REST API Usage Example
  *
  * Documentation
- * https://login.sendpulse.com/manual/rest-api/
  * https://sendpulse.com/api
  */
 
-var sendpulse = require("./api/sendpulse.js");
+var sendpulse = require("sendpulse-api");
 
 /*
  * https://login.sendpulse.com/settings/#api
@@ -24,7 +23,7 @@ sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE);
  *
  * @param data
  */
-var answerGetter = function answerGetter(data){
+var answerGetter = function(data) {
     console.log(data);
 }
 
