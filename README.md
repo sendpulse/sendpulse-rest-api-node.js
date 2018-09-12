@@ -1,5 +1,6 @@
 # SendPulse-rest-api-node.js
 A simple SendPulse REST client library and example for Node.js
+API Documentation [https://sendpulse.com/api](https://sendpulse.com/api)
 
 ### Install
 
@@ -20,9 +21,11 @@ var TOKEN_STORAGE = "/tmp/";
 
 sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE);
 
-var cb = function cb(data){
+var cb = function(data) {
     console.log(data);
 }
 
 sendpulse.listAddressBooks(cb);
 ```
+
+You can get full list of API library methods in [https://github.com/sendpulse/sendpulse-rest-api-node.js/blob/master/example.js](example)
