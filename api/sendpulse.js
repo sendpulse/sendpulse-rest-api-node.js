@@ -861,7 +861,8 @@ function smtpSendMail( callback, email ) {
     if (email===undefined){
         return callback(returnError('Empty email data'));
     }
-    email['html'] = base64(email['html']);
+    if (email.html)
+        email['html'] = base64(email['html']);
     var data = {
         email: serialize(email)
     };
