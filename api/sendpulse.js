@@ -46,14 +46,18 @@ function base64(data){
 /**
  * Sendpulse API initialization
  *
- * @param userId
+ * @param user_id
  * @param secret
  * @param storage
+ * @param callback
  */
-function init(user_id,secret,storage) {
-    API_USER_ID=user_id;
-    API_SECRET=secret;
-    TOKEN_STORAGE=storage;
+function init(user_id, secret, storage, callback) {
+    API_USER_ID = user_id;
+    API_SECRET = secret;
+
+    if(storage) {
+        TOKEN_STORAGE = storage;
+    }
 
     var hashName = md5(API_USER_ID+'::'+API_SECRET);
     if (fs.existsSync(TOKEN_STORAGE+hashName)) {
@@ -61,7 +65,9 @@ function init(user_id,secret,storage) {
     }
 
     if (! TOKEN.length) {
-        getToken();
+        getToken(callback);
+    } else if(callback && typeof callback === 'function') {
+        callback();
     }
 }
 
@@ -106,8 +112,9 @@ function sendRequest(path, method, data, useToken, callback){
             var str = '';
             response.on('data', function (chunk) {
                 if (response.statusCode==401) {
-                    getToken();
-                    sendRequest(path, method, data, true, callback);
+                    getToken(function() {
+                        sendRequest(path, method, data, true, callback);
+                    });
                 } else {
                     str += chunk;
                 }
@@ -133,7 +140,7 @@ function sendRequest(path, method, data, useToken, callback){
  * Get token and store it
  *
  */
-function getToken(){
+function getToken(callback){
     var data={
         grant_type:'client_credentials',
         client_id: API_USER_ID,
@@ -144,6 +151,10 @@ function getToken(){
         TOKEN = data.access_token;
         var hashName = md5(API_USER_ID+'::'+API_SECRET);
         fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
+
+        if(callback && typeof callback === 'function') {
+            callback()
+        }
     }
 }
 
