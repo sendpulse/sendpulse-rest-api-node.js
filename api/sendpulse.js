@@ -54,10 +54,7 @@ function base64(data){
 function init(user_id, secret, storage, callback) {
     API_USER_ID = user_id;
     API_SECRET = secret;
-
-    if(storage) {
-        TOKEN_STORAGE = storage;
-    }
+    TOKEN_STORAGE = storage;
 
     var hashName = md5(API_USER_ID+'::'+API_SECRET);
     if (fs.existsSync(TOKEN_STORAGE+hashName)) {
