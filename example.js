@@ -24,7 +24,7 @@ sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE,function(token) {
      *
      * @param data
      */
-    var answerGetter = function answerGetter(data){
+    var answerGetter = function(data) {
       console.log(data);
     }
 
