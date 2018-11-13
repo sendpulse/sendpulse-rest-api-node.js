@@ -427,6 +427,25 @@ function getEmailInfo(callback,id,email){
 }
 
 /**
+ * Update Variables for an email address in an address book
+ *
+ * @param callback
+ * @param id
+ * @param email
+ * @param variables
+ */
+function updateEmailVariables(callback,id,email,variables){
+    if ((id===undefined) || (email === undefined) || (variables === undefined) || (! variables.length)) {
+        return callback(returnError("Empty email, variables or book id"));
+    }
+    var data = {
+        email: email,
+        variables: variables
+    };
+    sendRequest( 'addressbooks/' + id + '/emails/variable', 'POST', data, true, callback );
+}
+
+/**
  * Get cost of campaign based on address book
  *
  * @param callback
@@ -1203,6 +1222,7 @@ exports.getEmailsFromBook = getEmailsFromBook;
 exports.addEmails = addEmails;
 exports.removeEmails = removeEmails;
 exports.getEmailInfo = getEmailInfo;
+exports.updateEmailVariables = updateEmailVariables;
 exports.campaignCost = campaignCost;
 exports.listCampaigns = listCampaigns;
 exports.getCampaignInfo = getCampaignInfo;

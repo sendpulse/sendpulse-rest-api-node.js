@@ -36,6 +36,7 @@ sendpulse.getEmailsFromBook(answerGetter,123456);
 sendpulse.addEmails(answerGetter, 123456, [{email:'some@domain.com',variables:{}}]);
 sendpulse.removeEmails(answerGetter, 123456, ['some@domain.com']);
 sendpulse.getEmailInfo(answerGetter,123456,'some@domain.com');
+sendpulse.updateEmailVariables(answerGetter,123456,'some@domain.com', [{"name":"test","type":"string", "value":"test"}]);
 sendpulse.campaignCost(answerGetter,123456);
 sendpulse.listCampaigns(answerGetter,10,20);
 sendpulse.getCampaignInfo(answerGetter,123456);
