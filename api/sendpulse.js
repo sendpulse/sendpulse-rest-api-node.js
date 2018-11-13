@@ -56,6 +56,10 @@ function init(user_id, secret, storage, callback) {
     API_SECRET = secret;
     TOKEN_STORAGE = storage;
 
+    if (!callback) {
+        callback = function() {}
+    }
+
     var hashName = md5(API_USER_ID+'::'+API_SECRET);
     if (fs.existsSync(TOKEN_STORAGE+hashName)) {
         TOKEN = fs.readFileSync(TOKEN_STORAGE+hashName,{encoding:'utf8'});
@@ -63,8 +67,8 @@ function init(user_id, secret, storage, callback) {
 
     if (! TOKEN.length) {
         getToken(callback);
-    } else if(callback && typeof callback === 'function') {
-        callback();
+    } else {
+        callback(TOKEN)
     }
 }
 
@@ -136,8 +140,12 @@ function sendRequest(path, method, data, useToken, callback){
 /**
  * Get token and store it
  *
+ * @param callback
  */
 function getToken(callback){
+    if (!callback) {
+        callback = function() {}
+    }
     var data={
         grant_type:'client_credentials',
         client_id: API_USER_ID,
@@ -148,10 +156,7 @@ function getToken(callback){
         TOKEN = data.access_token;
         var hashName = md5(API_USER_ID+'::'+API_SECRET);
         fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
-
-        if(callback && typeof callback === 'function') {
-            callback()
-        }
+        callback(TOKEN)
     }
 }
 
