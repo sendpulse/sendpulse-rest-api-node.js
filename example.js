@@ -65,6 +65,8 @@ sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE,function(token) {
     sendpulse.smtpAddDomain(answerGetter,'some@domain.com');
     sendpulse.smtpVerifyDomain(answerGetter,'some@domain.com');
     sendpulse.updateEmailVariables(answerGetter,123456,'some@domain.com', [{"name":"test","type":"string", "value":"test"}]);
+    sendpulse.listEmailTemplates(answerGetter);
+    sendpulse.getEmailTemplate(answerGetter,123456);
 
     var email = {
       "html" : "<h1>Example text</h1>",
