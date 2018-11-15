@@ -25,4 +25,4 @@ sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE,function() {
 });
 ```
 
-You can get full list of API library methods in [https://raw.githubusercontent.com/sendpulse/sendpulse-rest-api-node.js/master/example.js](example)
+You can get full list of API library methods in [https://github.com/sendpulse/sendpulse-rest-api-node.js/blob/master/example.js](example)
