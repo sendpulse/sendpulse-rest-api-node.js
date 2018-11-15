@@ -46,14 +46,19 @@ function base64(data){
 /**
  * Sendpulse API initialization
  *
- * @param userId
+ * @param user_id
  * @param secret
  * @param storage
+ * @param callback
  */
-function init(user_id,secret,storage) {
-    API_USER_ID=user_id;
-    API_SECRET=secret;
-    TOKEN_STORAGE=storage;
+function init(user_id, secret, storage, callback) {
+    API_USER_ID = user_id;
+    API_SECRET = secret;
+    TOKEN_STORAGE = storage;
+
+    if (!callback) {
+        callback = function() {}
+    }
 
     var hashName = md5(API_USER_ID+'::'+API_SECRET);
     if (fs.existsSync(TOKEN_STORAGE+hashName)) {
@@ -61,7 +66,9 @@ function init(user_id,secret,storage) {
     }
 
     if (! TOKEN.length) {
-        getToken();
+        getToken(callback);
+    } else {
+        callback(TOKEN)
     }
 }
 
@@ -106,8 +113,9 @@ function sendRequest(path, method, data, useToken, callback){
             var str = '';
             response.on('data', function (chunk) {
                 if (response.statusCode==401) {
-                    getToken();
-                    sendRequest(path, method, data, true, callback);
+                    getToken(function() {
+                        sendRequest(path, method, data, true, callback);
+                    });
                 } else {
                     str += chunk;
                 }
@@ -132,8 +140,12 @@ function sendRequest(path, method, data, useToken, callback){
 /**
  * Get token and store it
  *
+ * @param callback
  */
-function getToken(){
+function getToken(callback){
+    if (!callback) {
+        callback = function() {}
+    }
     var data={
         grant_type:'client_credentials',
         client_id: API_USER_ID,
@@ -144,6 +156,7 @@ function getToken(){
         TOKEN = data.access_token;
         var hashName = md5(API_USER_ID+'::'+API_SECRET);
         fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
+        callback(TOKEN)
     }
 }
 
@@ -880,7 +893,8 @@ function smtpSendMail( callback, email ) {
     if (email===undefined){
         return callback(returnError('Empty email data'));
     }
-    email['html'] = base64(email['html']);
+    if (email.html)
+        email['html'] = base64(email['html']);
     var data = {
         email: serialize(email)
     };
