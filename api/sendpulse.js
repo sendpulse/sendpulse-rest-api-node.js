@@ -44,6 +44,19 @@ function base64(data){
 }
 
 /**
+ * Create directory
+ *
+ * @param directory
+ */
+function mkdirSyncRecursive(directory) {
+    var path = directory.replace(/\/$/, '').split('/');
+    for (var i = 1; i <= path.length; i++) {
+        var segment = path.slice(0, i).join('/');
+        segment.length > 0 && !fs.existsSync(segment) ? fs.mkdirSync(segment) : null ;
+    }
+};
+
+/**
  * Sendpulse API initialization
  *
  * @param user_id
@@ -58,6 +71,14 @@ function init(user_id, secret, storage, callback) {
 
     if (!callback) {
         callback = function() {}
+    }
+
+    if (!fs.existsSync(TOKEN_STORAGE)) {
+        mkdirSyncRecursive(TOKEN_STORAGE);
+    }
+
+    if (TOKEN_STORAGE.substr(-1) !== '/') {
+        TOKEN_STORAGE += '/';
     }
 
     var hashName = md5(API_USER_ID+'::'+API_SECRET);
@@ -134,6 +155,10 @@ function sendRequest(path, method, data, useToken, callback){
         }
     );
     req.write(JSON.stringify(data));
+    req.on('error', function(error) {
+        var answer = returnError(error.code);
+        callback(answer);
+    });
     req.end();
 }
 
@@ -1272,3 +1297,4 @@ exports.smsGetCampaignInfo = smsGetCampaignInfo;
 exports.smsCancelCampaign = smsCancelCampaign;
 exports.smsGetCampaignCost = smsGetCampaignCost;
 exports.smsDeleteCampaign = smsDeleteCampaign;
+exports.getToken = getToken;
