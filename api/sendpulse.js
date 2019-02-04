@@ -20,6 +20,12 @@ var API_SECRET="";
 var TOKEN_STORAGE="";
 var TOKEN="";
 
+var ERRORS = {
+    INVALID_TOKEN: 'Invalid token',
+    INVALID_RESPONCE: 'Bad responce from server',
+    INVALID_CREDENTIALS: 'Invalid credentials',
+};
+
 /**
  * MD5
  *
