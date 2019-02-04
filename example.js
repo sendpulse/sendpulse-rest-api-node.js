@@ -11,13 +11,17 @@ var sendpulse = require("sendpulse-api");
  * https://login.sendpulse.com/settings/#api
  */
 
-var API_USER_ID="USER_ID"
-var API_SECRET="USER_SECRET"
+var API_USER_ID="USER_ID";
+var API_SECRET="USER_SECRET";
 
-var TOKEN_STORAGE="/tmp/"
+var TOKEN_STORAGE="/tmp/";
 
-sendpulse.init(API_USER_ID,API_SECRET,TOKEN_STORAGE,function(token) {
-    console.log('your token: ' + token)
+sendpulse.init(API_USER_ID, API_SECRET, TOKEN_STORAGE, function(token) {
+    if (token && token.is_error) {
+        // error handling
+    }
+
+    console.log('your token: ' + token);
 
     /**
      * Function to process response data

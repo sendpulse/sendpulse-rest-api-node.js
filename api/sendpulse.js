@@ -133,13 +133,7 @@ function sendRequest(path, method, data, useToken, callback){
         function(response) {
             var str = '';
             response.on('data', function (chunk) {
-                if (response.statusCode==401) {
-                    getToken(function() {
-                        sendRequest(path, method, data, true, callback);
-                    });
-                } else {
-                    str += chunk;
-                }
+                str += chunk;
             });
 
             response.on('end', function () {
