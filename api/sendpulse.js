@@ -20,6 +20,12 @@ var API_SECRET="";
 var TOKEN_STORAGE="";
 var TOKEN="";
 
+var ERRORS = {
+    INVALID_TOKEN: 'Invalid token',
+    INVALID_RESPONCE: 'Bad responce from server',
+    INVALID_CREDENTIALS: 'Invalid credentials',
+};
+
 /**
  * MD5
  *
@@ -88,9 +94,10 @@ function init(user_id, secret, storage, callback) {
 
     if (! TOKEN.length) {
         getToken(callback);
-    } else {
-        callback(TOKEN)
+        return;
     }
+
+    callback(TOKEN)
 }
 
 /**
@@ -133,24 +140,34 @@ function sendRequest(path, method, data, useToken, callback){
         function(response) {
             var str = '';
             response.on('data', function (chunk) {
-                if (response.statusCode==401) {
-                    getToken(function() {
-                        sendRequest(path, method, data, true, callback);
-                    });
-                } else {
-                    str += chunk;
-                }
+                str += chunk;
             });
 
             response.on('end', function () {
-                if (response.statusCode != 401) {
-                    try {
-                        var answer = JSON.parse(str);
-                    } catch (ex) {
-                        var answer = returnError();
-                    }
-                    callback(answer);
+                try {
+                    var answer = JSON.parse(str);
+                } catch (ex) {
+                    var answer = returnError(ERRORS.INVALID_RESPONCE);
                 }
+
+                if (response.statusCode === 401) {
+                    if (answer.error === 'invalid_client') {
+                        callback(returnError(ERRORS.INVALID_CREDENTIALS));
+                        return;
+                    }
+
+                    getToken(function(result) {
+                        if (result && result.is_error === 1) {
+                            callback(result);
+                            return;
+                        }
+
+                        sendRequest(path, method, data, true, callback);
+                    });
+                    return;
+                }
+
+                callback(answer);
             });
         }
     );
@@ -178,6 +195,11 @@ function getToken(callback){
     }
     sendRequest( 'oauth/access_token', 'POST', data, false, saveToken );
     function saveToken(data) {
+        if (data && data.is_error) {
+            callback(data);
+            return;
+        }
+
         TOKEN = data.access_token;
         var hashName = md5(API_USER_ID+'::'+API_SECRET);
         fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
