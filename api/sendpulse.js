@@ -15,10 +15,10 @@ var crypto = require('crypto');
 var fs = require('fs');
 
 var API_URL = 'api.sendpulse.com';
-var API_USER_ID="";
-var API_SECRET="";
-var TOKEN_STORAGE="";
-var TOKEN="";
+var API_USER_ID = '';
+var API_SECRET = '';
+var TOKEN_STORAGE = '';
+var TOKEN = '';
 
 var ERRORS = {
     INVALID_TOKEN: 'Invalid token',
@@ -32,19 +32,19 @@ var ERRORS = {
  * @param data
  * @return string
  */
-function md5(data){
+function md5(data) {
     var md5sum = crypto.createHash('md5');
     md5sum.update(data);
     return md5sum.digest('hex');
 }
 
 /**
- * Basse64
+ * Base64
  *
  * @param data
  * @return string
  */
-function base64(data){
+function base64(data) {
     var b = new Buffer(data);
     return b.toString('base64');
 }
@@ -58,7 +58,7 @@ function mkdirSyncRecursive(directory) {
     var path = directory.replace(/\/$/, '').split('/');
     for (var i = 1; i <= path.length; i++) {
         var segment = path.slice(0, i).join('/');
-        segment.length > 0 && !fs.existsSync(segment) ? fs.mkdirSync(segment) : null ;
+        segment.length > 0 && !fs.existsSync(segment) ? fs.mkdirSync(segment) : null;
     }
 };
 
@@ -76,7 +76,8 @@ function init(user_id, secret, storage, callback) {
     TOKEN_STORAGE = storage;
 
     if (!callback) {
-        callback = function() {}
+        callback = function () {
+        }
     }
 
     if (!fs.existsSync(TOKEN_STORAGE)) {
@@ -87,12 +88,12 @@ function init(user_id, secret, storage, callback) {
         TOKEN_STORAGE += '/';
     }
 
-    var hashName = md5(API_USER_ID+'::'+API_SECRET);
-    if (fs.existsSync(TOKEN_STORAGE+hashName)) {
-        TOKEN = fs.readFileSync(TOKEN_STORAGE+hashName,{encoding:'utf8'});
+    var hashName = md5(API_USER_ID + '::' + API_SECRET);
+    if (fs.existsSync(TOKEN_STORAGE + hashName)) {
+        TOKEN = fs.readFileSync(TOKEN_STORAGE + hashName, {encoding: 'utf8'});
     }
 
-    if (! TOKEN.length) {
+    if (!TOKEN.length) {
         getToken(callback);
         return;
     }
@@ -111,13 +112,13 @@ function init(user_id, secret, storage, callback) {
  *        Define the function  that will be called
  *        when a response is received.
  */
-function sendRequest(path, method, data, useToken, callback){
-    var headers = {}
+function sendRequest(path, method, data, useToken, callback) {
+    var headers = {};
     headers['Content-Type'] = 'application/json';
-    headers['Content-Length'] =  Buffer.byteLength(JSON.stringify(data));
+    headers['Content-Length'] = Buffer.byteLength(JSON.stringify(data));
 
     if (useToken && TOKEN.length) {
-        headers['Authorization'] = 'Bearer '+TOKEN;
+        headers['Authorization'] = 'Bearer ' + TOKEN;
     }
     if (method === undefined) {
         method = 'POST';
@@ -128,7 +129,7 @@ function sendRequest(path, method, data, useToken, callback){
 
     var options = {
         //uri: API_URL,
-        path: '/'+path,
+        path: '/' + path,
         port: 443,
         hostname: API_URL,
         method: method,
@@ -137,7 +138,7 @@ function sendRequest(path, method, data, useToken, callback){
 
     var req = https.request(
         options,
-        function(response) {
+        function (response) {
             var str = '';
             response.on('data', function (chunk) {
                 str += chunk;
@@ -156,7 +157,7 @@ function sendRequest(path, method, data, useToken, callback){
                         return;
                     }
 
-                    getToken(function(result) {
+                    getToken(function (result) {
                         if (result && result.is_error === 1) {
                             callback(result);
                             return;
@@ -172,7 +173,7 @@ function sendRequest(path, method, data, useToken, callback){
         }
     );
     req.write(JSON.stringify(data));
-    req.on('error', function(error) {
+    req.on('error', function (error) {
         var answer = returnError(error.code);
         callback(answer);
     });
@@ -184,16 +185,18 @@ function sendRequest(path, method, data, useToken, callback){
  *
  * @param callback
  */
-function getToken(callback){
+function getToken(callback) {
     if (!callback) {
-        callback = function() {}
+        callback = function () {
+        }
     }
-    var data={
-        grant_type:'client_credentials',
+    var data = {
+        grant_type: 'client_credentials',
         client_id: API_USER_ID,
         client_secret: API_SECRET
-    }
-    sendRequest( 'oauth/access_token', 'POST', data, false, saveToken );
+    };
+    sendRequest('oauth/access_token', 'POST', data, false, saveToken);
+
     function saveToken(data) {
         if (data && data.is_error) {
             callback(data);
@@ -201,8 +204,8 @@ function getToken(callback){
         }
 
         TOKEN = data.access_token;
-        var hashName = md5(API_USER_ID+'::'+API_SECRET);
-        fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
+        var hashName = md5(API_USER_ID + '::' + API_SECRET);
+        fs.writeFileSync(TOKEN_STORAGE + hashName, TOKEN);
         callback(TOKEN)
     }
 }
@@ -210,10 +213,10 @@ function getToken(callback){
 /**
  * Form error object
  *
- *  @return array
+ *  @return object
  */
-function returnError(message){
-    var data = {is_error:1};
+function returnError(message) {
+    var data = {is_error: 1};
     if (message !== undefined && message.length) {
         data['message'] = message
     }
@@ -328,8 +331,8 @@ function serialize(mixed_value) {
  * @param limit
  * @param offset
  */
-function listAddressBooks(callback,limit,offset){
-    var data={}
+function listAddressBooks(callback, limit, offset) {
+    var data = {};
     if (limit === undefined) {
         limit = null;
     } else {
@@ -349,12 +352,12 @@ function listAddressBooks(callback,limit,offset){
  * @param callback
  * @param bookName
  */
-function createAddressBook(callback,bookName) {
-    if ((bookName === undefined) || (! bookName.length)) {
-        return callback(returnError("Empty book name"));
+function createAddressBook(callback, bookName) {
+    if ((bookName === undefined) || (!bookName.length)) {
+        return callback(returnError('Empty book name'));
     }
     var data = {bookName: bookName};
-    sendRequest( 'addressbooks', 'POST', data, true, callback );
+    sendRequest('addressbooks', 'POST', data, true, callback);
 }
 
 /**
@@ -364,12 +367,12 @@ function createAddressBook(callback,bookName) {
  * @param id
  * @param bookName
  */
-function editAddressBook(callback,id,bookName) {
-    if ((id===undefined) || (bookName === undefined) || (! bookName.length)) {
-        return callback(returnError("Empty book name or book id"));
+function editAddressBook(callback, id, bookName) {
+    if ((id === undefined) || (bookName === undefined) || (!bookName.length)) {
+        return callback(returnError('Empty book name or book id'));
     }
     var data = {name: bookName};
-    sendRequest( 'addressbooks/' + id, 'PUT', data, true, callback );
+    sendRequest('addressbooks/' + id, 'PUT', data, true, callback);
 }
 
 /**
@@ -378,11 +381,11 @@ function editAddressBook(callback,id,bookName) {
  * @param callback
  * @param id
  */
-function removeAddressBook(callback,id){
-    if (id===undefined) {
+function removeAddressBook(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'addressbooks/' + id, 'DELETE', {}, true, callback );
+    sendRequest('addressbooks/' + id, 'DELETE', {}, true, callback);
 }
 
 /**
@@ -390,7 +393,7 @@ function removeAddressBook(callback,id){
  *
  * @param callback
  */
-function listEmailTemplates(callback){
+function listEmailTemplates(callback) {
     sendRequest('templates', 'GET', {}, true, callback);
 }
 
@@ -400,7 +403,7 @@ function listEmailTemplates(callback){
  * @param callback
  * @param id
  */
-function getEmailTemplate(callback, id){
+function getEmailTemplate(callback, id) {
     if (id === undefined) {
         return callback(returnError('Empty email template id'));
     }
@@ -413,11 +416,11 @@ function getEmailTemplate(callback, id){
  * @param callback
  * @param id
  */
-function getBookInfo(callback,id){
-    if (id===undefined) {
+function getBookInfo(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'addressbooks/' + id, 'GET', {}, true, callback );
+    sendRequest('addressbooks/' + id, 'GET', {}, true, callback);
 }
 
 /**
@@ -426,11 +429,11 @@ function getBookInfo(callback,id){
  * @param callback
  * @param id
  */
-function getEmailsFromBook(callback,id){
-    if (id===undefined) {
+function getEmailsFromBook(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'addressbooks/' + id + '/emails', 'GET', {}, true, callback );
+    sendRequest('addressbooks/' + id + '/emails', 'GET', {}, true, callback);
 }
 
 /**
@@ -440,12 +443,12 @@ function getEmailsFromBook(callback,id){
  * @param id
  * @param emails
  */
-function addEmails(callback,id,emails){
-    if ((id===undefined) || (emails === undefined) || (! emails.length)) {
-        return callback(returnError("Empty email or book id"));
+function addEmails(callback, id, emails) {
+    if ((id === undefined) || (emails === undefined) || (!emails.length)) {
+        return callback(returnError('Empty email or book id'));
     }
     var data = {emails: serialize(emails)};
-    sendRequest( 'addressbooks/' + id + '/emails', 'POST', data, true, callback );
+    sendRequest('addressbooks/' + id + '/emails', 'POST', data, true, callback);
 }
 
 /**
@@ -455,12 +458,12 @@ function addEmails(callback,id,emails){
  * @param id
  * @param emails
  */
-function removeEmails(callback,id,emails){
-    if ((id===undefined) || (emails === undefined) || (! emails.length)) {
-        return callback(returnError("Empty email or book id"));
+function removeEmails(callback, id, emails) {
+    if ((id === undefined) || (emails === undefined) || (!emails.length)) {
+        return callback(returnError('Empty email or book id'));
     }
     var data = {emails: serialize(emails)};
-    sendRequest( 'addressbooks/' + id + '/emails', 'DELETE', data, true, callback );
+    sendRequest('addressbooks/' + id + '/emails', 'DELETE', data, true, callback);
 }
 
 /**
@@ -470,11 +473,11 @@ function removeEmails(callback,id,emails){
  * @param id
  * @param email
  */
-function getEmailInfo(callback,id,email){
-    if ((id===undefined) || (email === undefined) || (! email.length)) {
-        return callback(returnError("Empty email or book id"));
+function getEmailInfo(callback, id, email) {
+    if ((id === undefined) || (email === undefined) || (!email.length)) {
+        return callback(returnError('Empty email or book id'));
     }
-    sendRequest( 'addressbooks/' + id + '/emails/' + email, 'GET', {}, true, callback );
+    sendRequest('addressbooks/' + id + '/emails/' + email, 'GET', {}, true, callback);
 
 }
 
@@ -486,15 +489,15 @@ function getEmailInfo(callback,id,email){
  * @param email
  * @param variables
  */
-function updateEmailVariables(callback,id,email,variables){
-    if ((id===undefined) || (email === undefined) || (variables === undefined) || (! variables.length)) {
-        return callback(returnError("Empty email, variables or book id"));
+function updateEmailVariables(callback, id, email, variables) {
+    if ((id === undefined) || (email === undefined) || (variables === undefined) || (!variables.length)) {
+        return callback(returnError('Empty email, variables or book id'));
     }
     var data = {
         email: email,
         variables: variables
     };
-    sendRequest( 'addressbooks/' + id + '/emails/variable', 'POST', data, true, callback );
+    sendRequest('addressbooks/' + id + '/emails/variable', 'POST', data, true, callback);
 }
 
 /**
@@ -503,12 +506,11 @@ function updateEmailVariables(callback,id,email,variables){
  * @param callback
  * @param id
  */
-function campaignCost(callback,id) {
-    if (id===undefined) {
+function campaignCost(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'addressbooks/' + id + '/cost', 'GET', {}, true, callback );
-
+    sendRequest('addressbooks/' + id + '/cost', 'GET', {}, true, callback);
 }
 
 /**
@@ -518,8 +520,8 @@ function campaignCost(callback,id) {
  * @param limit
  * @param offset
  */
-function listCampaigns(callback,limit,offset){
-    var data={}
+function listCampaigns(callback, limit, offset) {
+    var data = {};
     if (limit === undefined) {
         limit = null;
     } else {
@@ -539,11 +541,11 @@ function listCampaigns(callback,limit,offset){
  * @param callback
  * @param id
  */
-function getCampaignInfo(callback,id){
-    if (id===undefined) {
+function getCampaignInfo(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'campaigns/' + id, 'GET', {}, true, callback );
+    sendRequest('campaigns/' + id, 'GET', {}, true, callback);
 }
 
 /**
@@ -552,11 +554,11 @@ function getCampaignInfo(callback,id){
  * @param callback
  * @param id
  */
-function campaignStatByCountries(callback,id){
-    if (id===undefined) {
+function campaignStatByCountries(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'campaigns/' + id + '/countries', 'GET', {}, true, callback );
+    sendRequest('campaigns/' + id + '/countries', 'GET', {}, true, callback);
 }
 
 /**
@@ -565,11 +567,11 @@ function campaignStatByCountries(callback,id){
  * @param callback
  * @param id
  */
-function campaignStatByReferrals(callback,id){
-    if (id===undefined) {
+function campaignStatByReferrals(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty book id'));
     }
-    sendRequest( 'campaigns/' + id + '/referrals', 'GET', {}, true, callback );
+    sendRequest('campaigns/' + id + '/referrals', 'GET', {}, true, callback);
 }
 
 /**
@@ -584,17 +586,17 @@ function campaignStatByReferrals(callback,id){
  * @param name
  * @param attachments
  */
-function createCampaign(callback, senderName, senderEmail, subject, body, bookId, name, attachments){
-    if ((senderName===undefined)||(! senderName.length)||(senderEmail===undefined)||(! senderEmail.length)||(subject===undefined)||(! subject.length)||(body===undefined)||(! body.length)||(bookId===undefined)){
+function createCampaign(callback, senderName, senderEmail, subject, body, bookId, name, attachments) {
+    if ((senderName === undefined) || (!senderName.length) || (senderEmail === undefined) || (!senderEmail.length) || (subject === undefined) || (!subject.length) || (body === undefined) || (!body.length) || (bookId === undefined)) {
         return callback(returnError('Not all data.'));
     }
-    if (name===undefined){
-        name='';
+    if (name === undefined) {
+        name = '';
     }
-    if (attachments===undefined) {
-        attachments='';
+    if (attachments === undefined) {
+        attachments = '';
     }
-    if (attachments.length){
+    if (attachments.length) {
         attachments = serialize(attachments);
     }
     var data = {
@@ -607,8 +609,8 @@ function createCampaign(callback, senderName, senderEmail, subject, body, bookId
         list_id: bookId,
         name: name,
         attachments: attachments
-    }
-    sendRequest( 'campaigns', 'POST', data, true, callback );
+    };
+    sendRequest('campaigns', 'POST', data, true, callback);
 }
 
 /**
@@ -617,11 +619,11 @@ function createCampaign(callback, senderName, senderEmail, subject, body, bookId
  * @param callback
  * @param id
  */
-function cancelCampaign(callback, id){
-    if (id===undefined) {
+function cancelCampaign(callback, id) {
+    if (id === undefined) {
         return callback(returnError('Empty campaign id'));
     }
-    sendRequest( 'campaigns/' + id, 'DELETE', {}, true, callback );
+    sendRequest('campaigns/' + id, 'DELETE', {}, true, callback);
 }
 
 /**
@@ -629,8 +631,8 @@ function cancelCampaign(callback, id){
  *
  * @param callback
  */
-function listSenders(callback){
-    sendRequest( 'senders', 'GET', {}, true, callback );
+function listSenders(callback) {
+    sendRequest('senders', 'GET', {}, true, callback);
 }
 
 /**
@@ -640,15 +642,15 @@ function listSenders(callback){
  * @param senderName
  * @param senderEmail
  */
-function addSender(callback, senderName, senderEmail){
-    if ((senderEmail===undefined)||(!senderEmail.length)||(senderName===undefined)||(!senderName.length)) {
+function addSender(callback, senderName, senderEmail) {
+    if ((senderEmail === undefined) || (!senderEmail.length) || (senderName === undefined) || (!senderName.length)) {
         return callback(returnError('Empty sender name or email'));
     }
     var data = {
         email: senderEmail,
         name: senderName
-    }
-    sendRequest( 'senders', 'POST', data, true, callback );
+    };
+    sendRequest('senders', 'POST', data, true, callback);
 }
 
 /**
@@ -658,13 +660,13 @@ function addSender(callback, senderName, senderEmail){
  * @param senderEmail
  */
 function removeSender(callback, senderEmail) {
-    if ((senderEmail===undefined)||(!senderEmail.length)){
+    if ((senderEmail === undefined) || (!senderEmail.length)) {
         return callback(returnError('Empty email'));
     }
     var data = {
         email: senderEmail
-    }
-    sendRequest( 'senders', 'DELETE', data, true, callback );
+    };
+    sendRequest('senders', 'DELETE', data, true, callback);
 }
 
 /**
@@ -674,14 +676,14 @@ function removeSender(callback, senderEmail) {
  * @param senderEmail
  * @param code
  */
-function activateSender(callback, senderEmail, code){
-    if ((senderEmail===undefined)||(!senderEmail.length)||(code===undefined)||(!code.length)){
+function activateSender(callback, senderEmail, code) {
+    if ((senderEmail === undefined) || (!senderEmail.length) || (code === undefined) || (!code.length)) {
         return callback(returnError('Empty email or activation code'));
     }
     var data = {
         code: code
-    }
-    sendRequest( 'senders/' + senderEmail + '/code', 'POST', data, true, callback );
+    };
+    sendRequest('senders/' + senderEmail + '/code', 'POST', data, true, callback);
 }
 
 /**
@@ -690,11 +692,11 @@ function activateSender(callback, senderEmail, code){
  * @param callback
  * @param senderEmail
  */
-function getSenderActivationMail(callback, senderEmail ) {
-    if ((senderEmail===undefined)||(!senderEmail.length)){
+function getSenderActivationMail(callback, senderEmail) {
+    if ((senderEmail === undefined) || (!senderEmail.length)) {
         return callback(returnError('Empty email'));
     }
-    sendRequest( 'senders/' + senderEmail + '/code', 'GET', {}, true, callback );
+    sendRequest('senders/' + senderEmail + '/code', 'GET', {}, true, callback);
 }
 
 /**
@@ -704,10 +706,10 @@ function getSenderActivationMail(callback, senderEmail ) {
  * @param email
  */
 function getEmailGlobalInfo(callback, email) {
-    if ((email===undefined)||(!email.length)){
+    if ((email === undefined) || (!email.length)) {
         return callback(returnError('Empty email'));
     }
-    sendRequest( 'emails/' + email, 'GET', {}, true, callback );
+    sendRequest('emails/' + email, 'GET', {}, true, callback);
 }
 
 /**
@@ -716,11 +718,11 @@ function getEmailGlobalInfo(callback, email) {
  * @param callback
  * @param email
  */
-function removeEmailFromAllBooks(callback, email){
-    if ((email===undefined)||(!email.length)){
+function removeEmailFromAllBooks(callback, email) {
+    if ((email === undefined) || (!email.length)) {
         return callback(returnError('Empty email'));
     }
-    sendRequest( 'emails/' + email, 'DELETE', {}, true, callback );
+    sendRequest('emails/' + email, 'DELETE', {}, true, callback);
 }
 
 /**
@@ -729,11 +731,11 @@ function removeEmailFromAllBooks(callback, email){
  * @param callback
  * @param email
  */
-function emailStatByCampaigns(callback,email) {
-    if ((email===undefined)||(!email.length)){
+function emailStatByCampaigns(callback, email) {
+    if ((email === undefined) || (!email.length)) {
         return callback(returnError('Empty email'));
     }
-    sendRequest( 'emails/' + email + '/campaigns', 'GET', {}, true, callback );
+    sendRequest('emails/' + email + '/campaigns', 'GET', {}, true, callback);
 }
 
 /**
@@ -741,8 +743,8 @@ function emailStatByCampaigns(callback,email) {
  *
  * @param callback
  */
-function getBlackList(callback){
-    sendRequest( 'blacklist', 'GET', {}, true, callback );
+function getBlackList(callback) {
+    sendRequest('blacklist', 'GET', {}, true, callback);
 }
 
 /**
@@ -752,8 +754,8 @@ function getBlackList(callback){
  * @param emails
  * @param comment
  */
-function addToBlackList(callback, emails, comment){
-    if ((emails===undefined)||(!emails.length)){
+function addToBlackList(callback, emails, comment) {
+    if ((emails === undefined) || (!emails.length)) {
         return callback(returnError('Empty email'));
     }
     if (comment === undefined) {
@@ -762,8 +764,8 @@ function addToBlackList(callback, emails, comment){
     var data = {
         emails: base64(emails),
         comment: comment
-    }
-    sendRequest( 'blacklist', 'POST', data, true, callback );
+    };
+    sendRequest('blacklist', 'POST', data, true, callback);
 }
 
 /**
@@ -772,14 +774,14 @@ function addToBlackList(callback, emails, comment){
  * @param callback
  * @param emails
  */
-function removeFromBlackList(callback, emails){
-    if ((emails===undefined)||(!emails.length)){
+function removeFromBlackList(callback, emails) {
+    if ((emails === undefined) || (!emails.length)) {
         return callback(returnError('Empty emails'));
     }
     var data = {
         emails: base64(emails),
-    }
-    sendRequest( 'blacklist', 'DELETE', data, true, callback );
+    };
+    sendRequest('blacklist', 'DELETE', data, true, callback);
 }
 
 /**
@@ -788,13 +790,13 @@ function removeFromBlackList(callback, emails){
  * @param callback
  * @param currency
  */
-function getBalance(callback, currency){
+function getBalance(callback, currency) {
     if (currency === undefined) {
         var url = 'balance';
     } else {
-        var url =  'balance/' + currency.toUpperCase();
+        var url = 'balance/' + currency.toUpperCase();
     }
-    sendRequest( url, 'GET', {}, true, callback );
+    sendRequest(url, 'GET', {}, true, callback);
 }
 
 /**
@@ -834,8 +836,8 @@ function smtpListEmails(callback, limit, offset, fromDate, toDate, sender, recip
         to: toDate,
         sender: sender,
         recipient: recipient
-    }
-    sendRequest( 'smtp/emails', 'GET', data, true, callback );
+    };
+    sendRequest('smtp/emails', 'GET', data, true, callback);
 }
 
 /**
@@ -844,11 +846,11 @@ function smtpListEmails(callback, limit, offset, fromDate, toDate, sender, recip
  * @param callback
  * @param id
  */
-function smtpGetEmailInfoById(callback,id){
-    if ((id===undefined)||(! id.length)) {
+function smtpGetEmailInfoById(callback, id) {
+    if ((id === undefined) || (!id.length)) {
         return callback(returnError('Empty id'));
     }
-    sendRequest( 'smtp/emails/' + id, 'GET', {}, true, callback );
+    sendRequest('smtp/emails/' + id, 'GET', {}, true, callback);
 }
 
 /**
@@ -857,14 +859,14 @@ function smtpGetEmailInfoById(callback,id){
  * @param callback
  * @param emails
  */
-function smtpUnsubscribeEmails(callback, emails ) {
-    if (emails===undefined){
+function smtpUnsubscribeEmails(callback, emails) {
+    if (emails === undefined) {
         return callback(returnError('Empty emails'));
     }
     var data = {
         emails: serialize(emails)
-    }
-    sendRequest( 'smtp/unsubscribe', 'POST', data, true, callback );
+    };
+    sendRequest('smtp/unsubscribe', 'POST', data, true, callback);
 }
 
 /**
@@ -873,14 +875,14 @@ function smtpUnsubscribeEmails(callback, emails ) {
  * @param callback
  * @param emails
  */
-function smtpRemoveFromUnsubscribe( callback, emails ) {
-    if (emails===undefined){
+function smtpRemoveFromUnsubscribe(callback, emails) {
+    if (emails === undefined) {
         return callback(returnError('Empty emails'));
     }
     var data = {
         emails: serialize(emails)
-    }
-    sendRequest( 'smtp/unsubscribe', 'DELETE', data, true, callback );
+    };
+    sendRequest('smtp/unsubscribe', 'DELETE', data, true, callback);
 }
 
 /**
@@ -889,7 +891,7 @@ function smtpRemoveFromUnsubscribe( callback, emails ) {
  * @param callback
  */
 function smtpListIP(callback) {
-    sendRequest( 'smtp/ips', 'GET', {}, true, callback );
+    sendRequest('smtp/ips', 'GET', {}, true, callback);
 }
 
 /**
@@ -898,7 +900,7 @@ function smtpListIP(callback) {
  * @param callback
  */
 function smtpListAllowedDomains(callback) {
-    sendRequest( 'smtp/domains', 'GET', {}, true, callback );
+    sendRequest('smtp/domains', 'GET', {}, true, callback);
 }
 
 /**
@@ -908,13 +910,13 @@ function smtpListAllowedDomains(callback) {
  * @param email
  */
 function smtpAddDomain(callback, email) {
-    if ((email===undefined)||(!email.length)){
+    if ((email === undefined) || (!email.length)) {
         return callback(returnError('Empty email'));
     }
     var data = {
         email: email
-    }
-    sendRequest( 'smtp/domains', 'POST', data, true, callback );
+    };
+    sendRequest('smtp/domains', 'POST', data, true, callback);
 }
 
 /**
@@ -923,11 +925,11 @@ function smtpAddDomain(callback, email) {
  * @param callback
  * @param email
  */
-function smtpVerifyDomain(callback,email) {
-    if ((email===undefined)||(!email.length)){
+function smtpVerifyDomain(callback, email) {
+    if ((email === undefined) || (!email.length)) {
         return callback(returnError('Empty email'));
     }
-    sendRequest( 'smtp/domains/'+email, 'GET', {}, true, callback );
+    sendRequest('smtp/domains/' + email, 'GET', {}, true, callback);
 }
 
 /**
@@ -936,8 +938,8 @@ function smtpVerifyDomain(callback,email) {
  * @param callback
  * @param email
  */
-function smtpSendMail( callback, email ) {
-    if (email===undefined){
+function smtpSendMail(callback, email) {
+    if (email === undefined) {
         return callback(returnError('Empty email data'));
     }
     if (email.html)
@@ -945,7 +947,7 @@ function smtpSendMail( callback, email ) {
     var data = {
         email: serialize(email)
     };
-    sendRequest( 'smtp/emails', 'POST', data, true, callback );
+    sendRequest('smtp/emails', 'POST', data, true, callback);
 }
 
 
@@ -960,7 +962,7 @@ function smtpSendMail( callback, email ) {
  */
 function smsAddPhones(callback, addressbook_id, phones) {
     if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones or book id"));
+        return callback(returnError('Empty phones or book id'));
     }
     var data = {
         addressBookId: addressbook_id,
@@ -978,7 +980,7 @@ function smsAddPhones(callback, addressbook_id, phones) {
  */
 function smsAddPhonesWithVariables(callback, addressbook_id, phones) {
     if ((addressbook_id === undefined) || (phones === undefined) || (!Object.keys(phones).length)) {
-        return callback(returnError("Empty phones or book id"));
+        return callback(returnError('Empty phones or book id'));
     }
     var data = {
         addressBookId: addressbook_id,
@@ -996,7 +998,7 @@ function smsAddPhonesWithVariables(callback, addressbook_id, phones) {
  */
 function smsRemovePhones(callback, addressbook_id, phones) {
     if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones or book id"));
+        return callback(returnError('Empty phones or book id'));
     }
     var data = {
         addressBookId: addressbook_id,
@@ -1010,8 +1012,8 @@ function smsRemovePhones(callback, addressbook_id, phones) {
  *
  * @param callback
  */
-function smsGetBlackList(callback){
-    sendRequest( 'sms/black_list', 'GET', {}, true, callback );
+function smsGetBlackList(callback) {
+    sendRequest('sms/black_list', 'GET', {}, true, callback);
 }
 
 /**
@@ -1023,7 +1025,7 @@ function smsGetBlackList(callback){
  */
 function smsGetPhoneInfo(callback, addressbook_id, phone) {
     if ((addressbook_id === undefined) || (phone === undefined)) {
-        return callback(returnError("Empty phone or book id"));
+        return callback(returnError('Empty phone or book id'));
     }
 
     sendRequest('sms/numbers/info/' + addressbook_id + '/' + phone, 'GET', {}, true, callback);
@@ -1039,19 +1041,19 @@ function smsGetPhoneInfo(callback, addressbook_id, phone) {
  */
 function smsUpdatePhonesVariables(callback, addressbook_id, phones, variables) {
     if (addressbook_id === undefined) {
-        return callback(returnError("Empty book id"));
+        return callback(returnError('Empty book id'));
     }
     if ((phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones"));
+        return callback(returnError('Empty phones'));
     }
     if ((variables === undefined) || (!Object.keys(variables).length)) {
-        return callback(returnError("Empty variables"));
+        return callback(returnError('Empty variables'));
     }
     var data = {
         'addressBookId': addressbook_id,
         'phones': JSON.stringify(phones),
         'variables': JSON.stringify(variables)
-    }
+    };
 
     sendRequest('sms/numbers', 'PUT', data, true, callback);
 }
@@ -1064,11 +1066,11 @@ function smsUpdatePhonesVariables(callback, addressbook_id, phones, variables) {
  */
 function smsGetPhonesInfoFromBlacklist(callback, phones) {
     if ((phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones"));
+        return callback(returnError('Empty phones'));
     }
     var data = {
         'phones': JSON.stringify(phones),
-    }
+    };
 
     sendRequest('sms/black_list/by_numbers', 'GET', data, true, callback);
 }
@@ -1080,14 +1082,14 @@ function smsGetPhonesInfoFromBlacklist(callback, phones) {
  * @param phones
  * @param comment
  */
-function smsAddPhonesToBlacklist(callback, phones, comment){
+function smsAddPhonesToBlacklist(callback, phones, comment) {
     if ((phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones"));
+        return callback(returnError('Empty phones'));
     }
     var data = {
         'phones': JSON.stringify(phones),
         'description': comment
-    }
+    };
 
     sendRequest('sms/black_list', 'POST', data, true, callback);
 }
@@ -1100,11 +1102,11 @@ function smsAddPhonesToBlacklist(callback, phones, comment){
  */
 function smsDeletePhonesFromBlacklist(callback, phones) {
     if ((phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones"));
+        return callback(returnError('Empty phones'));
     }
     var data = {
         'phones': JSON.stringify(phones),
-    }
+    };
 
     sendRequest('sms/black_list', 'DELETE', data, true, callback);
 }
@@ -1119,15 +1121,15 @@ function smsDeletePhonesFromBlacklist(callback, phones) {
  * @param date
  * @param transliterate
  */
-function smsAddCampaign(callback, sender_name, addressbook_id, body, date, transliterate){
+function smsAddCampaign(callback, sender_name, addressbook_id, body, date, transliterate) {
     if (sender_name === undefined) {
-        return callback(returnError("Empty sender name"));
+        return callback(returnError('Empty sender name'));
     }
     if (addressbook_id === undefined) {
-        return callback(returnError("Empty book id"));
+        return callback(returnError('Empty book id'));
     }
     if (body === undefined) {
-        return callback(returnError("Empty sms text"));
+        return callback(returnError('Empty sms text'));
     }
     var data = {
         'sender': sender_name,
@@ -1135,7 +1137,7 @@ function smsAddCampaign(callback, sender_name, addressbook_id, body, date, trans
         'body': body,
         'date': date,
         'transliterate': transliterate
-    }
+    };
 
     sendRequest('sms/campaigns', 'POST', data, true, callback);
 }
@@ -1152,13 +1154,13 @@ function smsAddCampaign(callback, sender_name, addressbook_id, body, date, trans
  */
 function smsSend(callback, sender_name, phones, body, date, transliterate) {
     if (sender_name === undefined) {
-        return callback(returnError("Empty sender name"));
+        return callback(returnError('Empty sender name'));
     }
     if ((phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty phones"));
+        return callback(returnError('Empty phones'));
     }
     if (body === undefined) {
-        return callback(returnError("Empty sms text"));
+        return callback(returnError('Empty sms text'));
     }
     var data = {
         'sender': sender_name,
@@ -1166,7 +1168,7 @@ function smsSend(callback, sender_name, phones, body, date, transliterate) {
         'body': body,
         'date': date,
         'transliterate': transliterate
-    }
+    };
 
     sendRequest('sms/send', 'POST', data, true, callback);
 }
@@ -1182,7 +1184,7 @@ function smsGetListCampaigns(callback, date_from, date_to) {
     var data = {
         'dateFrom': date_from,
         'dateTo': date_to
-    }
+    };
 
     sendRequest('sms/campaigns/list', 'GET', data, true, callback);
 }
@@ -1193,9 +1195,9 @@ function smsGetListCampaigns(callback, date_from, date_to) {
  * @param callback
  * @param campaign_id
  */
-function smsGetCampaignInfo(callback, campaign_id){
+function smsGetCampaignInfo(callback, campaign_id) {
     if (campaign_id === undefined) {
-        return callback(returnError("Empty sms campaign id"));
+        return callback(returnError('Empty sms campaign id'));
     }
 
     sendRequest('sms/campaigns/info/' + campaign_id, 'GET', {}, true, callback);
@@ -1209,7 +1211,7 @@ function smsGetCampaignInfo(callback, campaign_id){
  */
 function smsCancelCampaign(callback, campaign_id) {
     if (campaign_id === undefined) {
-        return callback(returnError("Empty sms campaign id"));
+        return callback(returnError('Empty sms campaign id'));
     }
 
     sendRequest('sms/campaigns/cancel/' + campaign_id, 'PUT', {}, true, callback);
@@ -1224,21 +1226,21 @@ function smsCancelCampaign(callback, campaign_id) {
  * @param addressbook_id
  * @param phones
  */
-function smsGetCampaignCost(callback, sender_name, body, addressbook_id, phones){
+function smsGetCampaignCost(callback, sender_name, body, addressbook_id, phones) {
     if (sender_name === undefined) {
-        return callback(returnError("Empty sender name"));
+        return callback(returnError('Empty sender name'));
     }
     if (body === undefined) {
-        return callback(returnError("Empty sms text"));
+        return callback(returnError('Empty sms text'));
     }
     if ((addressbook_id === undefined) || (phones === undefined) || (!phones.length)) {
-        return callback(returnError("Empty book id or phones"));
+        return callback(returnError('Empty book id or phones'));
     }
     var data = {
         'sender': sender_name,
         'body': body,
         'addressBookId': addressbook_id
-    }
+    };
     if (phones.length) {
         data['phones'] = JSON.stringify(phones);
     }
@@ -1254,11 +1256,11 @@ function smsGetCampaignCost(callback, sender_name, body, addressbook_id, phones)
  */
 function smsDeleteCampaign(callback, campaign_id) {
     if (campaign_id === undefined) {
-        return callback(returnError("Empty sms campaign id"));
+        return callback(returnError('Empty sms campaign id'));
     }
     var data = {
         'id': campaign_id
-    }
+    };
     sendRequest('sms/campaigns', 'DELETE', data, true, callback);
 }
 
