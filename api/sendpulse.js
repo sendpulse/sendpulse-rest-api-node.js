@@ -1151,8 +1151,9 @@ function smsAddCampaign(callback, sender_name, addressbook_id, body, date, trans
  * @param body
  * @param date
  * @param transliterate
+ * @param route
  */
-function smsSend(callback, sender_name, phones, body, date, transliterate) {
+function smsSend(callback, sender_name, phones, body, date, transliterate, route) {
     if (sender_name === undefined) {
         return callback(returnError('Empty sender name'));
     }
@@ -1167,7 +1168,8 @@ function smsSend(callback, sender_name, phones, body, date, transliterate) {
         'phones': JSON.stringify(phones),
         'body': body,
         'date': date,
-        'transliterate': transliterate
+        'transliterate': transliterate,
+        'route': route
     };
 
     sendRequest('sms/send', 'POST', data, true, callback);
