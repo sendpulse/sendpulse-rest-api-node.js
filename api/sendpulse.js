@@ -22,7 +22,7 @@ var TOKEN = '';
 
 var ERRORS = {
     INVALID_TOKEN: 'Invalid token',
-    INVALID_RESPONCE: 'Bad responce from server',
+    INVALID_RESPONSE: 'Bad response from server',
     INVALID_CREDENTIALS: 'Invalid credentials',
 };
 
@@ -148,7 +148,7 @@ function sendRequest(path, method, data, useToken, callback) {
                 try {
                     var answer = JSON.parse(str);
                 } catch (ex) {
-                    var answer = returnError(ERRORS.INVALID_RESPONCE);
+                    var answer = returnError(ERRORS.INVALID_RESPONSE);
                 }
 
                 if (response.statusCode === 401) {
