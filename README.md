@@ -1,3 +1,5 @@
+![Node.js Package](https://github.com/sendpulse/sendpulse-rest-api-node.js/workflows/Node.js%20Package/badge.svg?event=release)
+
 # SendPulse-rest-api-node.js
 A simple SendPulse REST client library and example for Node.js
 
