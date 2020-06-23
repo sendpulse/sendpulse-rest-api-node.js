@@ -392,9 +392,20 @@ function removeAddressBook(callback, id) {
  * Get list of email templates
  *
  * @param callback
+ * @param owner
+ * @param locale
  */
-function listEmailTemplates(callback) {
-    sendRequest('templates', 'GET', {}, true, callback);
+function listEmailTemplates(callback, owner, locale) {
+    var data = {};
+    if (owner !== undefined) {
+        data['owner'] = owner;
+    }
+    if (locale === undefined) {
+        var url = 'templates';
+    } else {
+        var url = 'templates/' + locale;
+    }
+    sendRequest(url, 'GET', data, true, callback);
 }
 
 /**
