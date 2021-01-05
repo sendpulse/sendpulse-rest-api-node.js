@@ -1120,8 +1120,9 @@ function smsDeletePhonesFromBlacklist(callback, phones) {
  * @param body
  * @param date
  * @param transliterate
+ * @param route
  */
-function smsAddCampaign(callback, sender_name, addressbook_id, body, date, transliterate) {
+function smsAddCampaign(callback, sender_name, addressbook_id, body, date, transliterate, route) {
     if (sender_name === undefined) {
         return callback(returnError('Empty sender name'));
     }
@@ -1136,7 +1137,8 @@ function smsAddCampaign(callback, sender_name, addressbook_id, body, date, trans
         'addressBookId': addressbook_id,
         'body': body,
         'date': date,
-        'transliterate': transliterate
+        'transliterate': transliterate,
+        'route': route
     };
 
     sendRequest('sms/campaigns', 'POST', data, true, callback);
