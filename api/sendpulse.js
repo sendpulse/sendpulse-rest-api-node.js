@@ -74,6 +74,7 @@ function init(user_id, secret, storage, callback) {
     API_USER_ID = user_id;
     API_SECRET = secret;
     TOKEN_STORAGE = storage;
+    TOKEN = '';
 
     if (!callback) {
         callback = function () {
