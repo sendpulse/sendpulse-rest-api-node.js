@@ -1273,6 +1273,30 @@ function smsDeleteCampaign(callback, campaign_id) {
     sendRequest('sms/campaigns', 'DELETE', data, true, callback);
 }
 
+/**
+ * Send row request to RestAPI
+ *
+ * @param path
+ * @param method
+ * @param data
+ * @param callback
+ */
+function sendRowRequest(path, method, data, callback) {
+    if (data === undefined) {
+        data = {};
+    }
+    if (!callback) {
+        callback = function () {
+        }
+    }
+    var allowedMethods = ['POST', 'GET', 'DELETE', 'PUT', 'PATCH'];
+    if (!allowedMethods.includes(method)) {
+        return callback(returnError('Method not allowed'));
+    }
+
+    sendRequest(path, method, data, true, callback);
+}
+
 exports.init = init;
 exports.listAddressBooks = listAddressBooks;
 exports.createAddressBook = createAddressBook;
@@ -1331,3 +1355,4 @@ exports.smsCancelCampaign = smsCancelCampaign;
 exports.smsGetCampaignCost = smsGetCampaignCost;
 exports.smsDeleteCampaign = smsDeleteCampaign;
 exports.getToken = getToken;
+exports.sendRequest = sendRowRequest;
