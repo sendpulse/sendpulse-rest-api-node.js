@@ -247,14 +247,27 @@ function serialize(mixed_value) {
                 l = str.length,
                 code = '';
             for (i = 0; i < l; i++) {
-                code = str.charCodeAt(i);
-                if (code < 0x0080) {
-                    size += 1;
-                } else if (code < 0x0800) {
-                    size += 2;
+              code = str.charCodeAt(i);
+              if (code < 0x0080) { //[0x0000, 0x007F]
+                size += 1;
+              } else if (code < 0x0800) { //[0x0080, 0x07FF]
+                size += 2;
+              } else if (code < 0xD800) { //[0x0800, 0xD7FF]
+                size += 3;
+              } else if (code < 0xDC00) { //[0xD800, 0xDBFF]
+                var lo=str.charCodeAt(++i);
+                if (i < l && lo >= 0xDC00 && lo <= 0xDFFF) { //followed by [0xDC00, 0xDFFF]
+                  size += 4;
                 } else {
-                    size += 3;
+                  // UCS-2 String malformed
+                  size = 0
                 }
+              } else if (code < 0xE000) { //[0xDC00, 0xDFFF]
+                //  UCS-2 String malformed
+                size = 0
+              } else { //[0xE000, 0xFFFF]
+                size += 3;
+              }
             }
             return size;
         },
