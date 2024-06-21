@@ -965,7 +965,7 @@ function smtpSendMail(callback, email) {
     if (email.html)
         email['html'] = base64(email['html']);
     var data = {
-        email: serialize(email)
+        email
     };
     sendRequest('smtp/emails', 'POST', data, true, callback);
 }
